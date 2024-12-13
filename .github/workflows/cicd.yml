@@ -1,0 +1,28 @@
+name: Deploy React application
+
+on:
+  push:
+    branches:
+      - mern-ec2-docker
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build Docker Image
+        run: docker build -t tiru2167/reactjs-app .
+      - name: Publish Image to Docker Hub
+        run: docker push tiru2167/reactjs-app:latest
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Pull Image from Docker Hub
+        run: docker pull tiru2167/reactjs-app
+      - name: Run Docker Container
+        run: docker run -d -p 3000:80 --name reactjs-app-container-new tiru2167/reactjs-app
