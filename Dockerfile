@@ -1,13 +1,11 @@
-# Build Stage
 FROM node:18-alpine AS build
 
 WORKDIR /app
 COPY package.json . 
-RUN npm install
+RUN npm install --legacy-peer-deps  # Use legacy peer deps to bypass the conflict
 COPY . . 
 RUN npm run build
 
-# Production Stage
 FROM nginx:1.23-alpine
 
 WORKDIR /usr/share/nginx/html
